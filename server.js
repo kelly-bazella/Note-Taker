@@ -3,38 +3,47 @@ var app = express();
 var fs = require("fs")
 var PORT = 8000
 var bodyParser = require('body-parser')
+var notes = JSON.parse(fs.readFileSync("./db/db.json"))
+var path = require('path');
 
 app.use(express.static('public'))
 
-app.use(bodyParser.urlencoded({ extended: false }))
- 
-// parse application/json
-app.use(bodyParser.json())
- 
-app.use(function (req, res) {
-  res.setHeader('Content-Type', 'text/plain')
-  res.write('you posted:\n')
-  res.end(JSON.stringify(req.body, null, 2))
-})
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+// app.use(express.static(path.join(__dirname, "Develop/public")));
 
-
+let userNotes = [];
+console.log(userNotes)
 // routes
 
 app.get("/", function(req, res) {
-  res.sendFile(path.join(__dirname, "../public/index.html"));
+  res.sendFile(path.join(__dirname, "/public/index.html"));
 });
 
 app.get("/notes", function(req, res) {
-  res.sendFile(path.join(__dirname, "../public/notes.html"));
+  res.sendFile(path.join(__dirname, "/public/notes.html"));
 });
 
+app.get("/api/notes", function(req, res){
+  return res.sendFile(path.join(__dirname, "./db/db.json"))
+});
 
-// API call to get notes to display to page
+app.post("/api/notes", function(req, res){
+  console.log(res)
+  // let title = req.body.title;
+  // let text = req.body.text;
+  // title.push(userNotes)
+  // text.push(userNotes)
+  userNotes= fs.readFileSync("")
+  fs.writeFile("./db/db.json", JSON.stringify(userNotes),"utf8", function(err){
+    if (err) throw err;
+  })
+  res.json(JSON.parse(userNotes))
+})
 
-// User note to JSON file
+app.delete("/api/notes/:id", function (req, res){
 
-// 
-
+})
 
 // listener
 app.listen(PORT, function() {
