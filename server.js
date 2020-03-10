@@ -12,8 +12,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // app.use(express.static(path.join(__dirname, "Develop/public")));
 
-let userNotes = [];
-console.log(userNotes)
 // routes
 
 app.get("/", function(req, res) {
@@ -25,25 +23,39 @@ app.get("/notes", function(req, res) {
 });
 
 app.get("/api/notes", function(req, res){
-  return res.sendFile(path.join(__dirname, "./db/db.json"))
+  res.sendFile(path.join(__dirname, "./db/db.json"))
 });
 
 app.post("/api/notes", function(req, res){
-  console.log(res)
-  // let title = req.body.title;
-  // let text = req.body.text;
-  // title.push(userNotes)
-  // text.push(userNotes)
-  userNotes= fs.readFileSync("")
-  fs.writeFile("./db/db.json", JSON.stringify(userNotes),"utf8", function(err){
-    if (err) throw err;
-  })
-  res.json(JSON.parse(userNotes))
+  let userNotes = [];
+  let newNote = req.body;
+  userNotes.push(newNote);
+  for (var i = 0; i<userNotes.length; i++){
+    newNote.id = i
+    fs.writeFile("./db/db.json", JSON.stringify(userNotes), function(err){
+        if(err) throw err;
+        })
+    res.json(newNote)
+  }
 })
 
 app.delete("/api/notes/:id", function (req, res){
-
-})
+  try {
+    userNotes = fs.readFileSync("./db/db.json", "utf-8");
+    userNotes = JSON.parse(userNotes);
+    userNotes = userNotes.filter(function(note) {
+      return note.id != req.params.id;
+    });
+    userNotes = JSON.stringify(userNotes);
+    fs.writeFile("./db/db.json", userNotes, "utf8", function(err) {
+      //
+      if (err) throw err;
+    });
+    res.send(JSON.parse(userNotes));
+  } catch (err) {
+    throw err;
+  }
+});
 
 // listener
 app.listen(PORT, function() {
