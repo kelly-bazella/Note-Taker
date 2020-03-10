@@ -5,7 +5,7 @@ var PORT = 8000
 var bodyParser = require('body-parser')
 var notes = JSON.parse(fs.readFileSync("./db/db.json"))
 var path = require('path');
-
+var allNotes = JSON.parse(fs.readFileSync("./db/db.json"))
 app.use(express.static('public'))
 
 app.use(express.json());
@@ -27,31 +27,28 @@ app.get("/api/notes", function(req, res){
 });
 
 app.post("/api/notes", function(req, res){
-  let userNotes = [];
   let newNote = req.body;
-  userNotes.push(newNote);
-  for (var i = 0; i<userNotes.length; i++){
-    newNote.id = i
-    fs.writeFile("./db/db.json", JSON.stringify(userNotes), function(err){
+  newNote.id = allNotes.length+1;
+  allNotes.push(newNote);
+  fs.writeFile("./db/db.json", JSON.stringify(allNotes), function(err){
         if(err) throw err;
         })
     res.json(newNote)
-  }
-})
+});
 
 app.delete("/api/notes/:id", function (req, res){
   try {
-    userNotes = fs.readFileSync("./db/db.json", "utf-8");
-    userNotes = JSON.parse(userNotes);
-    userNotes = userNotes.filter(function(note) {
+    allNotes = fs.readFileSync("./db/db.json", "utf-8");
+    allNotes = JSON.parse(allNotes);
+    allNotes = allNotes.filter(function(note) {
       return note.id != req.params.id;
     });
-    userNotes = JSON.stringify(userNotes);
-    fs.writeFile("./db/db.json", userNotes, "utf8", function(err) {
+    allNotes = JSON.stringify(allNotes);
+    fs.writeFile("./db/db.json", allNotes, "utf8", function(err) {
       //
       if (err) throw err;
     });
-    res.send(JSON.parse(userNotes));
+    res.send(JSON.parse(allNotes));
   } catch (err) {
     throw err;
   }
