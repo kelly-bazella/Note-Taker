@@ -12,3 +12,4 @@ User will be brought to a homepage where they can click "Get Started" to take th
 
 ## GIF
 
+![](demo.gif)
